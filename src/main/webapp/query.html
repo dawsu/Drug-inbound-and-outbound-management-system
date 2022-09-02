@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>账单查询</title>
+<link rel="stylesheet" type="text/css" href="css/style.css" /> 
+<script src="js/ajax.js"></script>
+<script type="text/javascript">
+$(function (){
+	$("#myInput").on("input",function(){
+		table();
+	});
+});
+function table(){
+	document.getElementById("display").style.display="";
+	var tb=document.getElementById('mytable');
+	var rowNum=tb.rows.length;
+	for(i=1;i<rowNum;i++){tb.deleteRow(i);rowNum=rowNum-1;i=i-1;}
+	$.ajax({
+		async : false,
+        type : "POST", 
+        url : "http://localhost/DMS/Queryt",
+        dataType : "json",
+        data:{"id":document.getElementById("myInput").value},
+        success: function (data) {	       	    	
+        	for(var i =0 ;i<data.length; i+=4){
+				var x=document.getElementById('mytable').insertRow(1);
+				var r1=x.insertCell(0),r2=x.insertCell(1),r3=x.insertCell(2),r4=x.insertCell(3),r5=x.insertCell(4),r6=x.insertCell(5);
+    			r1.innerHTML=data[i];r2.innerHTML=data[i+1];r3.innerHTML=data[i+2];r4.innerHTML=data[i+3];
+        		r5.innerHTML="<input class='EleId' type='button' value='删除' onClick='delRow(this)'>";	
+			}        		   	
+        }	        
+	})
+}
+function delRow(obj){
+	var tr = this.getRowObj(obj);
+	$.ajax({
+		async : false,
+    	type : "get", 
+    	url : "http://localhost/DMS/Reduce",
+    	dataType : "text",
+    	data:{"id":tr.cells[0].innerHTML,
+    		  "date":tr.cells[3].innerHTML},
+    	success: function (data) {alert(data);}		        
+	}) 
+	if(tr != null) tr.parentNode.removeChild(tr);	
+}
+function getRowObj(obj){
+	while(obj.tagName.toLowerCase() != "tr") obj = obj.parentNode;
+	return obj;
+}
+</script>
+</head>
+<body>
+<div class='administrationMain'>
+	<h1>药品进出口账单查询</h1>
+	<br><br>
+	<div class='Mj'>
+		<input id="myInput" class="administration" type="text" placeholder="点此搜索" maxlength="10">
+	</div>
+	<div class='lj' id="display">
+		<p>查询结果</p>
+		<table id="mytable">
+			<tr><th>编号</th><th>名称</th><th>数量</th><th>日期</th><th>删除</th></tr>
+		</table>
+		<br><br>
+        <button type="button" onClick="location.href='home.html'">返回首页</button>
+	</div>
+	
+</div>
+</body>
+</html>
