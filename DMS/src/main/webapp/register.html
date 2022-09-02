@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>药品登记</title>
+<link rel="stylesheet" type="text/css" href="css/style.css" /> 
+<script src="js/ajax.js"></script>
+<script type="text/javascript">
+$(function (){
+	document.getElementById("input").style.display="none";
+});
+function idJudge(){
+	var value = document.getElementById("Oid").value;
+	var ele = document.getElementById("message");
+	ele.style.color = "red";
+	if(!isNaN(value) && value.length == 8) {
+		nameJudge();
+	} else {
+		ele.innerHTML = "请输入8位数字药品编号";	
+	}
+}
+function nameJudge(){
+	var value = document.getElementById("Oname").value;
+	var ele = document.getElementById("message");
+	ele.style.color = "red";
+	if(value.length != 0) {
+		numJudge();
+	} else {
+		ele.innerHTML = "请输入药品名称";	
+	}
+}
+function numJudge(){
+	var value = document.getElementById("Onum").value;
+	var ele = document.getElementById("message");
+	ele.style.color = "red";
+	if(value == "") {
+		ele.innerHTML = "请输入药品数量";
+	} else {
+		var r = /^\+?[1-9][0-9]*$/;
+		if(r.test(value)) {
+			ele.style.color = "green";
+			ele.innerHTML = "审核通过";
+			document.getElementById("input").style.display="";
+		} else {
+			ele.innerHTML = "药品数量不是正整数";
+		}
+	}
+}
+function goRegister() {
+	$.ajax({
+		async: false,
+	    type: "POST",  
+	    url:"http://localhost/DMS/Register", 
+	    dataType : "text",
+	    data: {"id":document.getElementById("Oid").value,
+	    	   "name":document.getElementById("Oname").value,
+	    	   "num":document.getElementById("Onum").value,
+	    	   "date":cg.innerHTML=new Date().toLocaleString()},       
+	    success: function (data) {
+	    						 	alert(data);
+	    						 	if(data=="添加成功")
+	    						 		location.href='home.html';
+	    						 }		
+	});
+}
+setInterval("cg.innerHTML=new Date().toLocaleString()",1000);
+</script>
+</head>
+<body>
+<div class="registerWindow">
+	<h1>药品登记</h1>
+    <form id="addForm">
+    	<input type="text" placeholder="药品编号" id="Oid" name=Oid maxlength="8" required/>
+    	<br><br>
+    	<input type="text" placeholder="药品名称" id="Oname" name="Oname" maxlength="16" required/>
+    	<br><br>
+    	<input type="text" placeholder="药品数量" id="Onum" name="Onum" maxlength="8" required/>
+    	<br><br>
+    	<span id="cg">2000/01/01 00:00:00</span>
+    	<br><br>
+    	<div id="message"></div>
+    	<br>
+        <button type="button" onClick="location.href='home.html'">返回首页</button>
+    	<br><br>
+        <button type="button" onclick="idJudge()">审核数据</button>
+    	<br><br>
+        <button type="button" id="input" onclick="goRegister()">提交数据</button>
+    </form>
+</div>
+</body>
+</html>
